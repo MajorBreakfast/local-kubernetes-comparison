@@ -1,0 +1,8 @@
+name: Kubernetes Comparison 10x
+
+on:
+  workflow_dispatch:
+
+jobs:
+  comparison:
+    uses: .github/workflows/comparison.yaml

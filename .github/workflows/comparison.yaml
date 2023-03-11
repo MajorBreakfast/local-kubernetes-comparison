@@ -2,6 +2,7 @@ name: Kubernetes Comparison
 
 on:
   push:
+  workflow_call:
 
 jobs:
   kind:
