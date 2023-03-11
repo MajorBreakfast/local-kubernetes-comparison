@@ -5,4 +5,4 @@ on:
 
 jobs:
   comparison:
-    uses: .github/workflows/comparison.yaml
+    uses: ./.github/workflows/comparison.yaml
