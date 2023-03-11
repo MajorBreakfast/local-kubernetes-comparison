@@ -5,7 +5,7 @@ on:
 
 jobs:
   comparison:
-    name: comparison-${{ matrix.number }}
+    name: run-${{ matrix.number }}
     uses: ./.github/workflows/comparison.yaml
     strategy:
       fail-fast: false
