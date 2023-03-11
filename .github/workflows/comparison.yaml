@@ -13,7 +13,7 @@ jobs:
   k3d:
     runs-on: ubuntu-latest
     steps:
-      - run: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Create cluster
         uses: AbsaOSS/k3d-action@v2
