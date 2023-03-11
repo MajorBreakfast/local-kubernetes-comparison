@@ -26,7 +26,7 @@ jobs:
 
       - name: Wait for rollout
         timeout-minutes: 1
-        run: while ! curl localhost  -s -o /dev/null -w "%{http_code}"; do sleep 1; done
+        run: while ! curl localhost:8080 -s -o /dev/null -w "%{http_code}"; do sleep 1; done
 
       - name: Verify
         run: curl -fsSL localhost:8080
