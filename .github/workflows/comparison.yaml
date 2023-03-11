@@ -28,7 +28,4 @@ jobs:
         run: while ! kubectl rollout status deploy -n=default -w; do sleep 1; done
 
       - name: Verify
-        run: |
-          kubectl get po -o yaml
-          kubectl get svc -o yaml
-          curl -fsSL localhost:8080
+        run: curl -fsSL localhost:8080
