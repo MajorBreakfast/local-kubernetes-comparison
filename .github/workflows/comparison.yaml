@@ -19,7 +19,7 @@ jobs:
 
   #     - name: Wait for rollout
   #       timeout-minutes: 1
-  #       run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
+  #       run: while [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost)" != "200" ]; do sleep 1; done
 
   #     - name: 🔍 Verify
   #       run: curl -fsSL localhost
@@ -40,7 +40,7 @@ jobs:
 
   #     - name: Wait for rollout
   #       timeout-minutes: 1
-  #       run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
+  #       run: while [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost)" != "200" ]; do sleep 1; done
 
   #     - name: 🔍 Verify
   #       run: curl -fsSL localhost
@@ -60,7 +60,7 @@ jobs:
 
   #     - name: Wait for rollout
   #       timeout-minutes: 1
-  #       run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
+  #       run: while [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost)" != "200" ]; do sleep 1; done
 
   #     - name: 🔍 Verify
   #       run: curl -fsSL localhost
@@ -80,7 +80,7 @@ jobs:
 
       - name: Wait for rollout
         timeout-minutes: 1
-        run: while ! curl localhost:30080 -s -o /dev/null -w "%{http_code}\n"; kubectl get svc; do sleep 1; done
+        run: while [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:30080)" != "200" ]; do sleep 1; done
 
       - name: 🔍 Verify
         run: curl -fsSL localhost:30080
