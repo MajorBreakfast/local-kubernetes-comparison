@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # Retrieve job data from Github API
-jobs=$(gh api -X GET /repos/MajorBreakfast/local-kubernetes-comparison/actions/runs/4393373145/jobs)
+jobs=$(gh api -X GET /repos/MajorBreakfast/local-kubernetes-comparison/actions/runs/4393653965/jobs)
 
-echo $jobs | jq '.jobs[] | "\(.name) \((.completed_at | fromdate) - (.started_at | fromdate))"'
+echo $jobs | jq '
+  .jobs
+  | map({ run: (.name | split(" / ") | .[0] ), job: (.name | split(" / ") | .[1] ), duration: ((.completed_at | fromdate) - (.started_at | fromdate)) })
+  | group_by(.job)
+  | map( [{key: "job", value: .[0].job }] + map({key: .run, value: .duration}) )
+' | jq -r '(.[0] | map(.key)), (.[] | map(.value)) | @csv' > 6-usage-in-ci/timings.csv
