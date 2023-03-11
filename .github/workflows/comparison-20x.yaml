@@ -1,4 +1,4 @@
-name: Kubernetes Comparison 10x
+name: Kubernetes Comparison 20x
 
 on:
   workflow_dispatch:
