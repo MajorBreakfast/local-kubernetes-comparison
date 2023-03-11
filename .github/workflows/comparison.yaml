@@ -4,7 +4,14 @@ on:
   push:
 
 jobs:
-  kind:
+  # kind:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Create cluster
+  #       uses: helm/kind-action@v1.4.0
+
+  k3d:
     runs-on: ubuntu-latest
     steps:
-      - uses: helm/kind-action@v1.4.0
+      - name: Create cluster
+        uses: nolar/setup-k3d-k3s@v1
