@@ -13,7 +13,19 @@ jobs:
   k3d:
     runs-on: ubuntu-latest
     steps:
+      - run: actions/checkout@v3
+
       - name: Create cluster
         uses: AbsaOSS/k3d-action@v2
         with:
           cluster-name: test-cluster
+          args: --port "8080:30080@server:0:direct" --no-lb
+
+      - name: Install manifests
+        run: kubectl apply -f ./6-usage-in-ci/podinfo.yaml
+
+      - name: Wait for rollout
+        run: while ! kubectl rollout status deploy -n=default -w > /dev/null 2>&1; do sleep 1; done
+
+      - name: Verify
+        run: curl -fsSL localhost:8080
