@@ -14,33 +14,33 @@ jobs:
         with:
           config: ./6-usage-in-ci/kind-config.yaml
 
-      - name: Install manifests
+      - name: 🚀 Install manifests
         run: kubectl apply -f ./6-usage-in-ci/podinfo.yaml
 
       - name: Wait for rollout
         timeout-minutes: 1
         run: while ! curl localhost:8080 -s -o /dev/null -w "%{http_code}"; do sleep 1; done
 
-      - name: Verify
+      - name: 🔍 Verify
         run: curl -fsSL localhost:8080
 
-  # k3d:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+  k3d:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: Create cluster
-  #       uses: AbsaOSS/k3d-action@v2
-  #       with:
-  #         cluster-name: test-cluster
-  #         args: --port "8080:30080@server:0:direct" --no-lb
+      - name: Create cluster
+        uses: AbsaOSS/k3d-action@v2
+        with:
+          cluster-name: test-cluster
+          args: --port "8080:30080@server:0:direct" --no-lb
 
-  #     - name: Install manifests
-  #       run: kubectl apply -f ./6-usage-in-ci/podinfo.yaml
+      - name: 🚀 Install manifests
+        run: kubectl apply -f ./6-usage-in-ci/podinfo.yaml
 
-  #     - name: Wait for rollout
-  #       timeout-minutes: 1
-  #       run: while ! curl localhost:8080 -s -o /dev/null -w "%{http_code}"; do sleep 1; done
+      - name: Wait for rollout
+        timeout-minutes: 1
+        run: while ! curl localhost:8080 -s -o /dev/null -w "%{http_code}"; do sleep 1; done
 
-  #     - name: Verify
-  #       run: curl -fsSL localhost:8080
+      - name: 🔍 Verify
+        run: curl -fsSL localhost:8080
