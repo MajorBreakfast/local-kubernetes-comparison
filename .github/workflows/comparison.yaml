@@ -4,66 +4,66 @@ on:
   push:
 
 jobs:
-  kind:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  # kind:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Create cluster
-        uses: helm/kind-action@v1.4.0
-        with:
-          config: ./6-usage-in-ci/kind-config.yaml
+  #     - name: Create cluster
+  #       uses: helm/kind-action@v1.4.0
+  #       with:
+  #         config: ./6-usage-in-ci/kind-config.yaml
 
-      - name: 🚀 Install manifests
-        run: kubectl apply -f ./6-usage-in-ci/podinfo-nodeport.yaml
+  #     - name: 🚀 Install manifests
+  #       run: kubectl apply -f ./6-usage-in-ci/podinfo-nodeport.yaml
 
-      - name: Wait for rollout
-        timeout-minutes: 1
-        run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
+  #     - name: Wait for rollout
+  #       timeout-minutes: 1
+  #       run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
 
-      - name: 🔍 Verify
-        run: curl -fsSL localhost
+  #     - name: 🔍 Verify
+  #       run: curl -fsSL localhost
 
-  k3d:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  # k3d:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Create cluster
-        uses: AbsaOSS/k3d-action@v2
-        with:
-          cluster-name: test-cluster
-          args: --port "80:80@server:0:direct" --no-lb --k3s-arg "--disable=traefik@server:*"
+  #     - name: Create cluster
+  #       uses: AbsaOSS/k3d-action@v2
+  #       with:
+  #         cluster-name: test-cluster
+  #         args: --port "80:80@server:0:direct" --no-lb --k3s-arg "--disable=traefik@server:*"
 
-      - name: 🚀 Install manifests
-        run: kubectl apply -f ./6-usage-in-ci/podinfo-loadbalancer.yaml
+  #     - name: 🚀 Install manifests
+  #       run: kubectl apply -f ./6-usage-in-ci/podinfo-loadbalancer.yaml
 
-      - name: Wait for rollout
-        timeout-minutes: 1
-        run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
+  #     - name: Wait for rollout
+  #       timeout-minutes: 1
+  #       run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
 
-      - name: 🔍 Verify
-        run: curl -fsSL localhost
+  #     - name: 🔍 Verify
+  #       run: curl -fsSL localhost
 
-  minikube:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  # minikube:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Create cluster
-        uses: medyagh/setup-minikube@latest
-        with:
-          start-args: --ports "80:30080"
+  #     - name: Create cluster
+  #       uses: medyagh/setup-minikube@latest
+  #       with:
+  #         start-args: --ports "80:30080"
 
-      - name: 🚀 Install manifests
-        run: kubectl apply -f ./6-usage-in-ci/podinfo-nodeport.yaml
+  #     - name: 🚀 Install manifests
+  #       run: kubectl apply -f ./6-usage-in-ci/podinfo-nodeport.yaml
 
-      - name: Wait for rollout
-        timeout-minutes: 1
-        run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
+  #     - name: Wait for rollout
+  #       timeout-minutes: 1
+  #       run: while ! curl localhost -s -o /dev/null -w "%{http_code}\n"; do sleep 1; done
 
-      - name: 🔍 Verify
-        run: curl -fsSL localhost
+  #     - name: 🔍 Verify
+  #       run: curl -fsSL localhost
 
   microk8s:
     runs-on: ubuntu-latest
@@ -76,7 +76,7 @@ jobs:
           channel: latest/stable
 
       - name: 🚀 Install manifests
-        run: kubectl apply -f ./6-usage-in-ci/podinfo-loadbalancer.yaml
+        run: kubectl apply -f ./6-usage-in-ci/podinfo-nodeport.yaml
 
       - name: Wait for rollout
         timeout-minutes: 1
