@@ -25,7 +25,10 @@ jobs:
         run: kubectl apply -f ./6-usage-in-ci/podinfo.yaml
 
       - name: Wait for rollout
-        run: while ! kubectl rollout status deploy -n=default -w > /dev/null 2>&1; do sleep 1; done
+        run: while ! kubectl rollout status deploy -n=default -w; do sleep 1; done
 
       - name: Verify
-        run: curl -fsSL localhost:8080
+        run: |
+          kubectl get po -o yaml
+          kubectl get svc -o yaml
+          curl -fsSL localhost:8080
