@@ -14,4 +14,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create cluster
-        uses: nolar/setup-k3d-k3s@v1
+        uses: AbsaOSS/k3d-action@v2
