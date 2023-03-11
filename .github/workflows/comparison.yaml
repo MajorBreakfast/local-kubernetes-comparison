@@ -45,6 +45,27 @@ jobs:
       - name: 🔍 Verify
         run: curl -fsSL localhost
 
+  k3d-nodeport:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create cluster
+        uses: AbsaOSS/k3d-action@v2
+        with:
+          cluster-name: test-cluster
+          args: --port "30080:80@server:0:direct" --no-lb --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+
+      - name: 🚀 Install manifests
+        run: kubectl apply -f ./6-usage-in-ci/podinfo-nodeport.yaml
+
+      - name: Wait for rollout
+        timeout-minutes: 1
+        run: while [ "$(curl -s --max-time 1 -o /dev/null -w '%{http_code}' http://localhost)" != "200" ]; do echo "."; sleep 1; done
+
+      - name: 🔍 Verify
+        run: curl -fsSL localhost
+
   minikube:
     runs-on: ubuntu-latest
     steps:
