@@ -10,6 +10,12 @@ source $(dirname $0)/docker-helpers.sh
 
 if minikube status -p "${minikube_cluster_name}" | grep -q "Running"; then
   echo "Error: Cluster ${minikube_cluster_name} already exists"
+  exit 1
+fi
+
+if [ -f benchmark-minikube-result.csv ]; then
+  echo "File benchmark-minikube-result.csv already exists."
+  exit 1
 fi
 
 echo "iteration,duration_deleted_old_cluster,duration_created_new_cluster,duration_workload_responding" >> benchmark-minikube-result.csv
@@ -81,3 +87,11 @@ echo "$i,$duration_deleted_old_cluster,$duration_created_new_cluster,$duration_w
 done
 
 minikube delete -p "${minikube_cluster_name}"
+
+jq -Rsr 'split("\n") | .[0] | split(",") | .[1:] | join(",")' benchmark-minikube-result.csv > benchmark-minikube-result-averaged.csv
+jq -Rsr '
+  split("\n")
+  | .[1:]
+  | map(split(",") | map(tonumber?) | select(.[0] > 0))
+  | transpose | .[1:] | map(add/length) | join(",")
+' benchmark-minikube-result.csv >> benchmark-minikube-result-averaged.csv

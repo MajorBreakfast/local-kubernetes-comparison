@@ -10,6 +10,12 @@ source $(dirname $0)/docker-helpers.sh
 
 if kind get clusters | grep -w "${kind_cluster_name}" &>/dev/null; then
   echo "Error: Cluster ${kind_cluster_name} already exists"
+  exit 1
+fi
+
+if [ -f benchmark-kind-result.csv ]; then
+  echo "File benchmark-kind-result.csv already exists."
+  exit 1
 fi
 
 echo "iteration,duration_deleted_old_cluster,duration_created_new_cluster,duration_workload_responding" >> benchmark-kind-result.csv
@@ -97,3 +103,11 @@ echo "$i,$duration_deleted_old_cluster,$duration_created_new_cluster,$duration_w
 done
 
 kind delete cluster --name "${kind_cluster_name}"
+
+jq -Rsr 'split("\n") | .[0] | split(",") | .[1:] | join(",")' benchmark-kind-result.csv > benchmark-kind-result-averaged.csv
+jq -Rsr '
+  split("\n")
+  | .[1:]
+  | map(split(",") | map(tonumber?) | select(.[0] > 0))
+  | transpose | .[1:] | map(add/length) | join(",")
+' benchmark-kind-result.csv >> benchmark-kind-result-averaged.csv

@@ -1,2 +1,3 @@
 .DS_Store
 6-usage-in-ci/timings*.csv
+5-reset/*.csv

@@ -10,6 +10,12 @@ source $(dirname $0)/docker-helpers.sh
 
 if k3d cluster get "${k3d_cluster_name}" &> /dev/null; then
   echo "Error: Cluster ${k3d_cluster_name} already exists"
+  exit 1
+fi
+
+if [ -f benchmark-k3d-result.csv ]; then
+  echo "File benchmark-k3d-result.csv already exists."
+  exit 1
 fi
 
 echo "iteration,duration_deleted_old_cluster,duration_created_new_cluster,duration_workload_responding" >> benchmark-k3d-result.csv
@@ -107,3 +113,11 @@ echo "$i,$duration_deleted_old_cluster,$duration_created_new_cluster,$duration_w
 done
 
 k3d cluster delete "${k3d_cluster_name}"
+
+jq -Rsr 'split("\n") | .[0] | split(",") | .[1:] | join(",")' benchmark-k3d-result.csv > benchmark-k3d-result-averaged.csv
+jq -Rsr '
+  split("\n")
+  | .[1:]
+  | map(split(",") | map(tonumber?) | select(.[0] > 0))
+  | transpose | .[1:] | map(add/length) | join(",")
+' benchmark-k3d-result.csv >> benchmark-k3d-result-averaged.csv
