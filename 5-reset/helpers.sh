@@ -26,3 +26,13 @@ function docker_network_connect_if_needed() {
     docker network connect "$1" "$2"
   fi
 }
+
+function average_benchmark_csv() {
+  jq -Rsr 'split("\n") | .[0] | split(",") | .[1:] | join(",")' "$1" > "$2"
+  jq -Rsr '
+    split("\n")
+    | .[1:]
+    | map(split(",") | map(tonumber?) | select(.[0] > 0))
+    | transpose | .[1:] | map(add/length) | join(",")
+  ' "$1" > "$2"
+}

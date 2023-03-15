@@ -6,7 +6,7 @@ kind_cluster_name="kind"
 ports=("80:30080")
 proxied_registries=("docker.io" "ghcr.io" "k8s.gcr.io")
 
-source $(dirname $0)/docker-helpers.sh
+source $(dirname $0)/helpers.sh
 
 if kind get clusters | grep -w "${kind_cluster_name}" &>/dev/null; then
   echo "Error: Cluster ${kind_cluster_name} already exists"
@@ -103,11 +103,4 @@ echo "$i,$duration_deleted_old_cluster,$duration_created_new_cluster,$duration_w
 done
 
 kind delete cluster --name "${kind_cluster_name}"
-
-jq -Rsr 'split("\n") | .[0] | split(",") | .[1:] | join(",")' benchmark-kind-result.csv > benchmark-kind-result-averaged.csv
-jq -Rsr '
-  split("\n")
-  | .[1:]
-  | map(split(",") | map(tonumber?) | select(.[0] > 0))
-  | transpose | .[1:] | map(add/length) | join(",")
-' benchmark-kind-result.csv >> benchmark-kind-result-averaged.csv
+average_benchmark_csv benchmark-kind-result.csv benchmark-kind-result-averaged.csv
