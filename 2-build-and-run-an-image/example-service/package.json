@@ -1,0 +1,22 @@
+{
+  "name": "example-service",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --watch --loader ts-node/esm --no-warnings src/app.ts",
+    "start": "npm run build && node dist/app.js"
+  },
+  "dependencies": {
+    "fastify": "^4.14.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^1.0.1",
+    "ts-node": "^10.9.1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100
+  }
+}

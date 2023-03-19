@@ -1,1 +1,3 @@
+- [Challenge 1 - First Cluster](./1-first-cluster/)
+- [Challenge 2 - Build and run an image](./2-build-and-run-an-image/)
 - [Challenge 6 - Usage in CI](./6-usage-in-ci/)
