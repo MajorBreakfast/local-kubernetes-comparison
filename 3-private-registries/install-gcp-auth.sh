@@ -4,13 +4,82 @@ helm upgrade --install kyverno kyverno \
   --set replicaCount=1 \
   --wait
 
+PRINT_GCP_AUTH_SECRET_SCRIPT='
+registry_hosts=(
+	"gcr.io"
+	"us.gcr.io"
+	"eu.gcr.io"
+	"asia.gcr.io"
+	"marketplace.gcr.io"
+  "asia-docker.pkg.dev"
+	"asia-east1-docker.pkg.dev"
+	"asia-east2-docker.pkg.dev"
+	"asia-northeast1-docker.pkg.dev"
+	"asia-northeast2-docker.pkg.dev"
+	"asia-northeast3-docker.pkg.dev"
+	"asia-south1-docker.pkg.dev"
+	"asia-south2-docker.pkg.dev"
+	"asia-southeast1-docker.pkg.dev"
+	"asia-southeast2-docker.pkg.dev"
+	"australia-southeast1-docker.pkg.dev"
+	"australia-southeast2-docker.pkg.dev"
+	"europe-docker.pkg.dev"
+	"europe-central2-docker.pkg.dev"
+	"europe-north1-docker.pkg.dev"
+	"europe-southwest1-docker.pkg.dev"
+	"europe-west1-docker.pkg.dev"
+	"europe-west2-docker.pkg.dev"
+	"europe-west3-docker.pkg.dev"
+	"europe-west4-docker.pkg.dev"
+	"europe-west6-docker.pkg.dev"
+	"europe-west8-docker.pkg.dev"
+	"europe-west9-docker.pkg.dev"
+	"europe-west12-docker.pkg.dev"
+	"me-west1-docker.pkg.dev"
+	"northamerica-northeast1-docker.pkg.dev"
+	"northamerica-northeast2-docker.pkg.dev"
+	"southamerica-east1-docker.pkg.dev"
+	"southamerica-west1-docker.pkg.dev"
+	"us-docker.pkg.dev"
+	"us-central1-docker.pkg.dev"
+	"us-east1-docker.pkg.dev"
+	"us-east4-docker.pkg.dev"
+	"us-east5-docker.pkg.dev"
+	"us-south1-docker.pkg.dev"
+	"us-west1-docker.pkg.dev"
+	"us-west2-docker.pkg.dev"
+	"us-west3-docker.pkg.dev"
+	"us-west4-docker.pkg.dev"
+)
+
+token="$(gcloud auth print-access-token)"
+
+dockercfg="{\"auths\": {"
+for host in "${registry_hosts[@]}"; do
+  dockercfg+="\"https://${host}\":{\"username\":\"oauth2accesstoken\",\"password\":\"$token\",\"email\":\"none\"},"
+done
+dockercfg="${dockercfg%,}"
+dockercfg+="}}"
+
+cat <<EOF
+kind: Secret
+apiVersion: v1
+metadata:
+  name: gcp-auth
+  namespace: gcp-auth
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: $(echo "$dockercfg" | base64 | tr -d "\\n")
+EOF
+'
+
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
   name: gcp-auth
 ---
-$($(dirname "$0")/print-gcp-auth-secret.sh "gcp-auth")
+$(eval "$PRINT_GCP_AUTH_SECRET_SCRIPT")
 ---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -94,7 +163,7 @@ metadata:
   namespace: gcp-auth
 data:
   print-gcp-auth-secret.sh: |
-$(cat $(dirname "$0")/print-gcp-auth-secret.sh | sed 's/^/    /')
+$(echo "$PRINT_GCP_AUTH_SECRET_SCRIPT" | sed 's/^/    /')
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -126,7 +195,7 @@ spec:
             - |
               while true; do
               echo "Updating gcp-auth secret..."
-              /scripts/print-gcp-auth-secret.sh gcp-auth | kubectl apply -f -
+              /scripts/print-gcp-auth-secret.sh | kubectl apply -f -
               sleep 300
               done
       volumes:
