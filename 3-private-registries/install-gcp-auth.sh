@@ -81,14 +81,27 @@ metadata:
 ---
 $(eval "$PRINT_GCP_AUTH_SECRET_SCRIPT")
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kyverno:gcp-auth-edit-serviceaccounts
+  labels:
+    app.kubernetes.io/instance: kyverno
+    app.kubernetes.io/name: kyverno
+    app: kyverno
+rules:
+- apiGroups: [""]
+  resources: [serviceaccounts]
+  verbs: [patch, update]
+---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: gcp-auth
+  name: gcp-auth-sync-secrets
 spec:
   generateExistingOnPolicyUpdate: true
   rules:
-    - name: sync-secrets
+    - name: clone-gcp-auth-secret
       match:
         any:
           - resources:
@@ -103,17 +116,27 @@ spec:
         clone:
           namespace: gcp-auth
           name: gcp-auth
-    - name: add-imagepullsecret-to-pods
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gcp-auth-edit-serviceaccounts
+spec:
+  mutateExistingOnPolicyUpdate: true
+  rules:
+    - name: add-imagepullsecret
       match:
         any:
-          - resources:
-              kinds:
-                - Pod
+        - resources:
+            kinds:
+            - ServiceAccount
       mutate:
+        targets:
+          - apiVersion: v1
+            kind: ServiceAccount
         patchStrategicMerge:
-          spec:
-            imagePullSecrets:
-              - name: gcp-auth
+          imagePullSecrets:
+            - name: gcp-auth
 EOF
 
 # Token Refresh Mechanism
@@ -123,7 +146,6 @@ kind: ServiceAccount
 metadata:
   name: gcp-auth
   namespace: gcp-auth
-automountServiceAccountToken: true
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
