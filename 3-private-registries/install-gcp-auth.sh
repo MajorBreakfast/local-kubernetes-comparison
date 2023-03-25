@@ -84,11 +84,11 @@ $(eval "$PRINT_GCP_AUTH_SECRET_SCRIPT")
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: sync-secrets
+  name: gcp-auth
 spec:
   generateExistingOnPolicyUpdate: true
   rules:
-    - name: sync-image-pull-secret
+    - name: sync-secrets
       match:
         any:
           - resources:
@@ -103,14 +103,7 @@ spec:
         clone:
           namespace: gcp-auth
           name: gcp-auth
----
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
-metadata:
-  name: add-imagepullsecrets
-spec:
-  rules:
-    - name: add-imagepullsecret
+    - name: add-imagepullsecret-to-pods
       match:
         any:
           - resources:
