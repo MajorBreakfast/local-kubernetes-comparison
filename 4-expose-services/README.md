@@ -1,13 +1,29 @@
 # 4 Expose services
 
-## Docker and Rancher Desktop
+## Load Balancer: Docker and Rancher Desktop
 
-Support load balancer: `kubectl apply -f podinfo-loadbalancer.yaml`
+`kubectl apply -f podinfo-loadbalancer.yaml`
 
-## K3D
+## Load Balancer: K3D
 
 ```sh
-k3d cluster create --port "80:80" --k3s-arg "--disable=traefik@servers:*"
+k3d cluster create --port 80:80 --k3s-arg '--disable=traefik@*'
 ```
 
 `kubectl apply -f podinfo-loadbalancer.yaml`
+
+## Load Balancer: Minikube (tunnel)
+
+## Node Port: Kind
+
+```sh
+kind create cluster --config - <<EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - hostPort: 80
+        containerPort: 30080
+EOF
+```
