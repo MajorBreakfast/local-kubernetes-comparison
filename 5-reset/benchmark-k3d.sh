@@ -82,7 +82,7 @@ options:
     disableLoadbalancer: true
   k3s:
     extraArgs:
-      - { arg: '--disable=traefik,metrics-server', nodeFilters: [server:*] }
+      - { arg: '--disable=traefik,metrics-server,lb', nodeFilters: [server:*] }
 EOF
 
 duration_created_new_cluster="$(($(date +%s) - timestamp_start))"
