@@ -3,7 +3,6 @@ set -Eeuo pipefail
 
 iterations="${1:-5}"
 kind_cluster_name="kind"
-ports=("80:30080")
 proxied_registries=("docker.io" "ghcr.io" "k8s.gcr.io")
 
 source $(dirname $0)/helpers.sh
@@ -56,9 +55,9 @@ apiVersion: kind.x-k8s.io/v1alpha4
 name: ${kind_cluster_name}
 nodes:
   - role: control-plane
-    extraPortMappings: $(for port in "${ports[@]}"; do echo "
-      - { hostPort: ${port%%:*}, containerPort: ${port#*:} }
-    "; done;)
+    extraPortMappings:
+      - hostPort: 80
+        containerPort: 30080
 containerdConfigPatches:
   $(for registry in "${proxied_registries[@]}"; do echo "
   - |-

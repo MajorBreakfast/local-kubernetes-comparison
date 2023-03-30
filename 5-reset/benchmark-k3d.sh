@@ -3,7 +3,6 @@ set -Eeuo pipefail
 
 iterations="${1:-5}"
 k3d_cluster_name="k3s-default"
-ports=("80:30080")
 proxied_registries=("docker.io" "ghcr.io" "k8s.gcr.io")
 
 source $(dirname $0)/helpers.sh
@@ -67,10 +66,8 @@ kind: Simple
 metadata:
   name: ${k3d_cluster_name}
 ports:
-  $(for port in "${ports[@]}"; do echo "
-  - port: ${port}
+  - port: 80:30080
     nodeFilters: [server:0:direct]
-  "; done;)
 registries:
   config: |
     mirrors:
@@ -82,7 +79,8 @@ options:
     disableLoadbalancer: true
   k3s:
     extraArgs:
-      - { arg: '--disable=traefik,metrics-server,lb', nodeFilters: [server:*] }
+      - arg: --disable=traefik,metrics-server
+        nodeFilters: [server:*]
 EOF
 
 duration_created_new_cluster="$(($(date +%s) - timestamp_start))"
