@@ -1,0 +1,7 @@
+iteration,duration_deleted_old_cluster,duration_created_new_cluster,duration_workload_responding
+0,,138,146
+1,7,102,146
+2,7,109,149
+3,7,106,154
+4,7,113,162
+5,6,103,145
