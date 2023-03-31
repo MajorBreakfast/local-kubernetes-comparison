@@ -39,7 +39,7 @@ fi
 # Create microk8s Cluster
 # =================================================================
 
-microk8s install
+microk8s install --mem 8 --cpu 5
 
 duration_created_new_cluster="$(($(date +%s) - timestamp_start))"
 echo "🕐 Cluster created after ${duration_created_new_cluster} seconds"
@@ -70,5 +70,5 @@ echo "$i,$duration_deleted_old_cluster,$duration_created_new_cluster,$duration_w
 
 done
 
-microk8s cluster delete "${microk8s_cluster_name}"
+microk8s uninstall
 average_benchmark_csv benchmark-microk8s-result.csv benchmark-microk8s-result-averaged.csv

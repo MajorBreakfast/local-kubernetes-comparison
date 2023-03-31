@@ -8,7 +8,7 @@ proxied_registries=("docker.io" "ghcr.io" "k8s.gcr.io")
 
 source $(dirname $0)/helpers.sh
 
-if minikube status -p "${minikube_cluster_name}" | grep -q "Running"; then
+if minikube status -p "${minikube_cluster_name}" | grep -vq "Profile "${minikube_cluster_name}" not found."; then
   echo "Error: Cluster ${minikube_cluster_name} already exists"
   exit 1
 fi
@@ -31,7 +31,7 @@ duration_workload_responding=""
 # Delete old cluster
 # =================================================================
 
-if minikube status -p "${minikube_cluster_name}" | grep -q "Running"; then
+if minikube status -p "${minikube_cluster_name}" | grep -vq "Profile "${minikube_cluster_name}" not found."; then
   minikube delete -p "${minikube_cluster_name}"
 
   duration_deleted_old_cluster="$(($(date +%s) - timestamp_start))"
@@ -48,7 +48,7 @@ docker_run_if_needed -d --name "registry-proxy-docker.io" --restart=always -e RE
 # Create Minikube Cluster
 # =================================================================
 
-minikube start -p "${minikube_cluster_name}" --driver=docker \
+minikube start -p "${minikube_cluster_name}" --driver=podman \
     --addons="metrics-server" \
     --registry-mirror="http://registry-proxy-docker.io:5000" \
     --ports="$(IFS=,; echo "${ports[*]}")"
@@ -83,6 +83,8 @@ while true; do
 done
 
 echo "$i,$duration_deleted_old_cluster,$duration_created_new_cluster,$duration_workload_responding" >> benchmark-minikube-result.csv
+
+sleep 3
 
 done
 
