@@ -79,7 +79,7 @@ options:
     disableLoadbalancer: true
   k3s:
     extraArgs:
-      - arg: --disable=traefik,metrics-server
+      - arg: --disable=traefik,servicelb,metrics-server
         nodeFilters: [server:*]
 EOF
 
